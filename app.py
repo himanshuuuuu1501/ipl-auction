@@ -61,20 +61,25 @@ def enter():
     return redirect("/dashboard")
 
 
-# DASHBOARD
 @app.route("/dashboard")
 def dashboard():
 
     if "username" not in session:
         return redirect("/")
 
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM players")
+    players = cur.fetchall()
+
     return render_template(
         "dashboard.html",
         username=session["username"],
-        team=session["team"]
+        team=session["team"],
+        players=players
     )
 
 
 if __name__ == "__main__":
     app.run()
+
 
