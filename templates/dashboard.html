@@ -1,19 +1,292 @@
-<h1>IPL Auction Dashboard</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPL Auction 2024 — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #f5c518; --gold2: #e8a000;
+    --red: #e63946; --green: #06d6a0; --blue: #3b82f6;
+    --dark: #07090e; --card: #0d1117; --card2: #111827;
+    --border: rgba(245,197,24,0.18); --text: #e8e8e8; --muted: #6b7280;
+  }
+  body { background: var(--dark); color: var(--text); font-family: 'Barlow', sans-serif; min-height: 100vh; }
 
-<p>{{username}} | Team {{team}}</p>
+  /* ─── NAV ─── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(7,9,14,0.92); backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .nav-brand { font-family: 'Bebas Neue', cursive; font-size: 28px; letter-spacing: 3px;
+    background: linear-gradient(135deg,var(--gold),var(--gold2));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    display:flex; align-items:center; gap:10px; }
+  .nav-brand span { font-size:24px; -webkit-text-fill-color:initial; }
+  .nav-meta { display:flex; align-items:center; gap:12px; }
+  .nav-user { background:rgba(245,197,24,0.08); border:1px solid var(--border); border-radius:8px;
+    padding:6px 14px; font-size:13px; font-family:'Barlow Condensed',sans-serif; letter-spacing:1px; }
+  .nav-user strong { color:var(--gold); }
+  .nav-team { background:var(--gold); color:#07090e; border-radius:6px; padding:6px 14px;
+    font-family:'Bebas Neue',cursive; font-size:18px; letter-spacing:2px; }
+  .nav-link { color:var(--muted); text-decoration:none; font-size:13px;
+    font-family:'Barlow Condensed',sans-serif; letter-spacing:1px; text-transform:uppercase;
+    transition:color .2s; padding:6px 12px; border-radius:6px; border:1px solid transparent; }
+  .nav-link:hover, .nav-link.active { color:var(--gold); border-color:var(--border); }
 
-<hr>
+  /* ─── PAGE ─── */
+  .page { padding: 36px 32px 60px; max-width: 1400px; margin: 0 auto; }
 
-{% for p in players %}
+  .page-title { font-family:'Bebas Neue',cursive; font-size:48px; letter-spacing:4px; line-height:1; }
+  .page-title span { color:var(--gold); }
+  .page-subtitle { color:var(--muted); font-size:14px; margin-top:4px; letter-spacing:1px; }
 
-<div style="border:1px solid white;padding:15px;margin:10px;width:200px">
+  /* ─── KPI STRIP ─── */
+  .kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin:28px 0; }
+  .kpi {
+    background:var(--card); border:1px solid rgba(255,255,255,0.06);
+    border-radius:12px; padding:18px 20px;
+    transition: border-color .2s, transform .2s;
+  }
+  .kpi:hover { border-color:var(--border); transform:translateY(-2px); }
+  .kpi-icon { font-size:22px; margin-bottom:8px; }
+  .kpi-val { font-family:'Bebas Neue',cursive; font-size:32px; line-height:1; }
+  .kpi-lbl { font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-top:4px; }
+  .kpi-gold .kpi-val { color:var(--gold); }
+  .kpi-green .kpi-val { color:var(--green); }
+  .kpi-red   .kpi-val { color:var(--red); }
+  .kpi-blue  .kpi-val { color:var(--blue); }
 
-<h3>{{p[1]}}</h3>
+  /* ─── SECTION HEADING ─── */
+  .section-head {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:18px; padding-bottom:12px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .section-title { font-family:'Bebas Neue',cursive; font-size:26px; letter-spacing:3px; }
+  .section-title span { color:var(--gold); }
 
-Base Price: {{p[2]}} <br>
-Highest Bid: {{p[3]}} <br>
-Team: {{p[4]}} <br>
+  /* ─── TEAM LEADERBOARD ─── */
+  .team-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; margin-bottom:44px; }
+  .team-card {
+    background:var(--card); border:1px solid rgba(255,255,255,0.06);
+    border-radius:12px; padding:20px;
+    position:relative; overflow:hidden;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .team-card:hover { transform:translateY(-3px); box-shadow:0 12px 30px rgba(0,0,0,0.4); }
+  .team-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:3px;
+    background:var(--team-color, var(--gold));
+  }
+  .team-rank {
+    font-family:'Bebas Neue',cursive; font-size:40px; color:rgba(255,255,255,0.06);
+    position:absolute; top:10px; right:14px; line-height:1;
+  }
+  .team-name { font-family:'Bebas Neue',cursive; font-size:28px; letter-spacing:2px; }
+  .team-players { color:var(--muted); font-size:13px; margin-top:4px; }
+  .team-spend { font-family:'Barlow Condensed',cursive; font-size:22px; font-weight:700; color:var(--gold); margin-top:12px; }
+  .team-spend-lbl { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); font-family:'Barlow Condensed',sans-serif; }
+
+  /* team colour mapping */
+  .tc-CSK  { --team-color:#f5c518; }
+  .tc-MI   { --team-color:#004ba0; }
+  .tc-RCB  { --team-color:#e63946; }
+  .tc-LSG  { --team-color:#00d1b2; }
+  .tc-KKR  { --team-color:#7b2d8b; }
+  .tc-SRH  { --team-color:#ff6b00; }
+  .tc-DC   { --team-color:#0057e7; }
+  .tc-PBKS { --team-color:#ff0000; }
+
+  /* ─── PLAYERS TABLE ─── */
+  .table-wrap { overflow-x:auto; border-radius:12px; border:1px solid rgba(255,255,255,0.06); margin-bottom:44px; }
+  table { width:100%; border-collapse:collapse; }
+  thead { background:rgba(245,197,24,0.06); }
+  th {
+    padding:12px 16px;
+    font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--gold); font-weight:600; text-align:left; white-space:nowrap;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  td {
+    padding:14px 16px;
+    font-size:14px; border-bottom:1px solid rgba(255,255,255,0.04);
+    vertical-align:middle;
+  }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:rgba(255,255,255,0.02); }
+  .td-name { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:16px; }
+  .role-pill {
+    display:inline-block; padding:2px 8px; border-radius:4px;
+    font-size:10px; font-family:'Barlow Condensed',sans-serif; letter-spacing:1px; text-transform:uppercase;
+  }
+  .rp-Batsman      { background:rgba(6,214,160,0.12); color:#06d6a0; }
+  .rp-Bowler       { background:rgba(230,57,70,0.12); color:#e63946; }
+  .rp-All-Rounder  { background:rgba(245,197,24,0.12); color:var(--gold); }
+  .rp-Wicketkeeper { background:rgba(99,102,241,0.12); color:#818cf8; }
+  .td-bid { font-family:'Barlow Condensed',sans-serif; font-size:17px; font-weight:700; color:var(--gold); }
+  .td-team { font-family:'Bebas Neue',cursive; font-size:15px; letter-spacing:1px; }
+  .td-team.unsold { color:var(--muted); }
+
+  /* ─── AUCTION CHART (pure CSS bars) ─── */
+  .bar-chart { display:flex; flex-direction:column; gap:10px; margin-bottom:44px; }
+  .bar-row { display:flex; align-items:center; gap:14px; }
+  .bar-name { font-family:'Barlow Condensed',sans-serif; font-size:14px; width:160px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bar-track { flex:1; background:rgba(255,255,255,0.04); border-radius:4px; height:24px; position:relative; overflow:hidden; }
+  .bar-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--gold),var(--gold2)); transition:width 1s cubic-bezier(0.16,1,0.3,1); }
+  .bar-val { font-family:'Barlow Condensed',sans-serif; font-size:13px; color:var(--gold); width:70px; flex-shrink:0; text-align:right; }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width:6px; height:6px; }
+  ::-webkit-scrollbar-track { background:var(--dark); }
+  ::-webkit-scrollbar-thumb { background:rgba(245,197,24,0.2); border-radius:3px; }
+
+  @media(max-width:600px) {
+    nav { padding:0 16px; }
+    .page { padding:20px 16px 40px; }
+    .page-title { font-size:36px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand"><span>🏏</span> IPL AUCTION</div>
+  <div class="nav-meta">
+    <div class="nav-user">Logged in as <strong>{{ username }}</strong></div>
+    <div class="nav-team">{{ team }}</div>
+    <a href="/auction" class="nav-link">← Auction</a>
+    <a href="/logout" class="nav-link">Logout</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div style="margin-bottom:28px;">
+    <div class="page-title">AUCTION <span>DASHBOARD</span></div>
+    <div class="page-subtitle">Live standings · Player status · Franchise leaderboard</div>
+  </div>
+
+  <!-- KPI STRIP -->
+  {% set sold = players | selectattr('5', 'ne', 'Unsold') | list %}
+  {% set unsold_list = players | selectattr('5', 'equalto', 'Unsold') | list %}
+  {% set total_spend = sold | sum(attribute=4) %}
+  <div class="kpi-row">
+    <div class="kpi kpi-gold">
+      <div class="kpi-icon">🏏</div>
+      <div class="kpi-val">{{ players|length }}</div>
+      <div class="kpi-lbl">Total Players</div>
+    </div>
+    <div class="kpi kpi-green">
+      <div class="kpi-icon">✅</div>
+      <div class="kpi-val">{{ sold|length }}</div>
+      <div class="kpi-lbl">Players Sold</div>
+    </div>
+    <div class="kpi kpi-red">
+      <div class="kpi-icon">🔴</div>
+      <div class="kpi-val">{{ unsold_list|length }}</div>
+      <div class="kpi-lbl">Unsold</div>
+    </div>
+    <div class="kpi kpi-blue">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-val">₹{{ "%.0f"|format(total_spend/10000000) }}Cr</div>
+      <div class="kpi-lbl">Total Spent</div>
+    </div>
+    <div class="kpi kpi-gold">
+      <div class="kpi-icon">🏆</div>
+      <div class="kpi-val">{{ team_stats|length }}</div>
+      <div class="kpi-lbl">Active Franchises</div>
+    </div>
+  </div>
+
+  <!-- FRANCHISE LEADERBOARD -->
+  {% if team_stats %}
+  <div class="section-head">
+    <div class="section-title">FRANCHISE <span>LEADERBOARD</span></div>
+  </div>
+  <div class="team-grid">
+    {% for ts in team_stats %}
+    <div class="team-card tc-{{ ts[0] }}">
+      <div class="team-rank">#{{ loop.index }}</div>
+      <div class="team-name">{{ ts[0] }}</div>
+      <div class="team-players">{{ ts[1] }} player{{ 's' if ts[1] != 1 }}</div>
+      <div class="team-spend">₹{{ "%.1f"|format(ts[2]/10000000) }}Cr</div>
+      <div class="team-spend-lbl">Total Spent</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- SPENDING BAR CHART -->
+  {% if team_stats %}
+  {% set max_spend = team_stats[0][2] %}
+  <div class="section-head">
+    <div class="section-title">SPENDING <span>BREAKDOWN</span></div>
+  </div>
+  <div class="bar-chart">
+    {% for ts in team_stats %}
+    <div class="bar-row">
+      <div class="bar-name">{{ ts[0] }}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:{{ (ts[2]/max_spend*100)|int }}%"></div>
+      </div>
+      <div class="bar-val">₹{{ "%.1f"|format(ts[2]/10000000) }}Cr</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- PLAYERS TABLE -->
+  <div class="section-head">
+    <div class="section-title">ALL <span>PLAYERS</span></div>
+    <div style="font-size:13px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;">{{ players|length }} total</div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Player</th>
+          <th>Role</th>
+          <th>Nation</th>
+          <th>Matches</th>
+          <th>Runs</th>
+          <th>Wickets</th>
+          <th>SR</th>
+          <th>Bowl Avg</th>
+          <th>Base Price</th>
+          <th>Current Bid</th>
+          <th>Team</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in players %}
+        <tr>
+          <td style="color:var(--muted);font-family:'Barlow Condensed',sans-serif;">{{ loop.index }}</td>
+          <td class="td-name">{{ p[1] }}</td>
+          <td><span class="role-pill rp-{{ p[2] }}">{{ p[2] }}</span></td>
+          <td style="color:var(--muted);font-size:13px;">{{ p[6] }}</td>
+          <td style="text-align:center;">{{ p[11] }}</td>
+          <td style="text-align:center;">{{ p[7] if p[7] > 0 else '—' }}</td>
+          <td style="text-align:center;">{{ p[8] if p[8] > 0 else '—' }}</td>
+          <td style="text-align:center;">{{ p[9] if p[9] > 0 else '—' }}</td>
+          <td style="text-align:center;">{{ p[10] if p[10] > 0 else 'N/A' }}</td>
+          <td style="color:var(--muted);font-family:'Barlow Condensed',sans-serif;">₹{{ "%.0f"|format(p[3]/10000000) }}Cr</td>
+          <td class="td-bid">₹{{ "%.1f"|format(p[4]/10000000) }}Cr</td>
+          <td class="td-team {% if p[5]=='Unsold' %}unsold{% endif %}">{{ p[5] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 
 </div>
 
-{% endfor %}
+</body>
+</html>
