@@ -284,7 +284,15 @@ def logout():
     session.clear()
     return redirect("/")
 
-init_db()
+# Run init_db once after the server is ready, not at import time
+_db_initialized = False
+
+@app.before_request
+def setup():
+    global _db_initialized
+    if not _db_initialized:
+        init_db()
+        _db_initialized = True
 
 if __name__ == "__main__":
     app.run(debug=True)
