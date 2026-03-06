@@ -13,26 +13,42 @@ def get_conn():
 def init_db():
     conn = get_conn()
     cur = conn.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS players (
-            id SERIAL PRIMARY KEY,
-            name TEXT NOT NULL,
-            role TEXT NOT NULL,
-            base_price INTEGER NOT NULL,
-            current_bid INTEGER NOT NULL,
-            current_team TEXT DEFAULT 'Unsold',
-            nationality TEXT DEFAULT 'Indian',
-            runs INTEGER DEFAULT 0,
-            wickets INTEGER DEFAULT 0,
-            strike_rate FLOAT DEFAULT 0,
-            bowling_avg FLOAT DEFAULT 0,
-            matches INTEGER DEFAULT 0,
-            image_url TEXT DEFAULT ''
-        )
-    """)
+
+    # ── Add missing columns if the table already exists (safe migration) ──
+    cur.execute("CREATE TABLE IF NOT EXISTS players (id SERIAL PRIMARY KEY, name TEXT NOT NULL)")
+    migrations = [
+        ("role",        "TEXT NOT NULL DEFAULT 'Batsman'"),
+        ("base_price",  "INTEGER NOT NULL DEFAULT 0"),
+        ("current_bid", "INTEGER NOT NULL DEFAULT 0"),
+        ("current_team","TEXT DEFAULT 'Unsold'"),
+        ("nationality", "TEXT DEFAULT 'Indian'"),
+        ("runs",        "INTEGER DEFAULT 0"),
+        ("wickets",     "INTEGER DEFAULT 0"),
+        ("strike_rate", "FLOAT DEFAULT 0"),
+        ("bowling_avg", "FLOAT DEFAULT 0"),
+        ("matches",     "INTEGER DEFAULT 0"),
+        ("image_url",   "TEXT DEFAULT ''"),
+    ]
+    for col, defn in migrations:
+        try:
+            cur.execute(f"ALTER TABLE players ADD COLUMN {col} {defn}")
+            conn.commit()
+        except Exception:
+            conn.rollback()
 
     cur.execute("SELECT COUNT(*) FROM players")
     count = cur.fetchone()[0]
+
+    # If old data exists with wrong schema, wipe and reseed
+    cur.execute("""
+        SELECT column_name FROM information_schema.columns
+        WHERE table_name='players' AND column_name='nationality'
+    """)
+    has_nationality = cur.fetchone()
+
+    if count > 0 and not has_nationality:
+        cur.execute("DELETE FROM players")
+        count = 0
 
     if count == 0:
         players = [
@@ -148,6 +164,8 @@ def api_players():
     conn.close()
     return jsonify([{"id":r[0],"name":r[1],"role":r[2],"bid":r[3],"team":r[4]} for r in rows])
 
+# Called at import time so gunicorn (Render) runs it on startup
+init_db()
+
 if __name__ == "__main__":
-    init_db()
     app.run(debug=True)
