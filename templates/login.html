@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>IPL Auction Login</title>
+
+<style>
+
+body{
+background:#0b0b0b;
+color:white;
+font-family:Arial;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.box{
+background:#111;
+padding:40px;
+border-radius:10px;
+width:300px;
+}
+
+h2{
+text-align:center;
+color:#00eaff;
+}
+
+input,select{
+width:100%;
+padding:10px;
+margin-top:10px;
+background:#0a0a0a;
+border:1px solid #333;
+color:white;
+}
+
+button{
+width:100%;
+padding:10px;
+margin-top:15px;
+background:#00eaff;
+border:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>IPL Auction</h2>
+
+<form action="/enter" method="POST">
+
+<input name="username" placeholder="Your Name" required>
+
+<select name="team" required>
+
+<option value="">Select Team</option>
+<option value="CSK">CSK</option>
+<option value="MI">MI</option>
+<option value="RCB">RCB</option>
+<option value="LSG">LSG</option>
+
+</select>
+
+<button>Enter Auction</button>
+
+</form>
+
+</div>
+
+</body>
+</html>
