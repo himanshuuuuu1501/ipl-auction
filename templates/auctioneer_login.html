@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auctioneer Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;600&family=Barlow+Condensed:wght@700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--gold:#f5c518;--gold2:#e8a000;--dark:#07090e;--card:#0d1117;--border:rgba(245,197,24,0.25);--text:#e8e8e8;--muted:#6b7280;--red:#e63946}
+  body{background:var(--dark);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:0.15;z-index:0;animation:float 8s ease-in-out infinite}
+  .orb1{width:400px;height:400px;background:var(--red);top:-100px;right:-80px}
+  .orb2{width:350px;height:350px;background:var(--gold);bottom:-80px;left:-60px;animation-delay:-4s}
+  @keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(15px,-20px)}}
+  .wrapper{position:relative;z-index:10;width:400px;max-width:94vw;animation:rise .7s cubic-bezier(.16,1,.3,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+  .badge{text-align:center;margin-bottom:24px}
+  .badge-icon{font-size:48px;display:block;animation:bounce 2s ease-in-out infinite}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .badge-title{font-family:'Bebas Neue',cursive;font-size:44px;letter-spacing:4px;background:linear-gradient(135deg,var(--red),#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+  .badge-sub{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:5px;color:var(--muted);text-transform:uppercase;margin-top:4px}
+  .card{background:var(--card);border:1px solid rgba(230,57,70,0.25);border-radius:16px;padding:36px 32px;box-shadow:0 0 0 1px rgba(230,57,70,0.05),0 24px 60px rgba(0,0,0,0.6);position:relative;overflow:hidden}
+  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent)}
+  .field{margin-bottom:20px}
+  .field-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:8px;display:block}
+  input{width:100%;padding:13px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;outline:none;transition:border-color .2s,box-shadow .2s}
+  input::placeholder{color:var(--muted)}
+  input:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(230,57,70,0.12)}
+  .btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--red),#c0392b);border:none;border-radius:8px;color:#fff;font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:3px;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(230,57,70,0.3)}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(230,57,70,0.4)}
+  .error{background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;padding:12px 16px;color:var(--red);font-size:14px;margin-bottom:16px;text-align:center}
+  .back-link{display:block;text-align:center;margin-top:18px;color:var(--muted);font-size:13px;text-decoration:none;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;transition:color .2s}
+  .back-link:hover{color:var(--gold)}
+  .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(230,57,70,0.2),transparent);margin:20px 0}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="wrapper">
+  <div class="badge">
+    <span class="badge-icon">🎙️</span>
+    <div class="badge-title">AUCTIONEER</div>
+    <div class="badge-sub">Control Panel Access</div>
+  </div>
+  <div class="card">
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+    <form action="/auctioneer/enter" method="POST">
+      <div class="field">
+        <label class="field-label">Auctioneer Password</label>
+        <input type="password" name="password" placeholder="Enter password…" required autofocus>
+      </div>
+      <div class="divider"></div>
+      <button class="btn" type="submit">ACCESS PANEL →</button>
+    </form>
+  </div>
+  <a href="/" class="back-link">← Back to bidder login</a>
+</div>
+</body>
+</html>
