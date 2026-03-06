@@ -14,63 +14,46 @@ def init_db():
     conn = get_conn()
     cur = conn.cursor()
 
-    # ── Add missing columns if the table already exists (safe migration) ──
-    cur.execute("CREATE TABLE IF NOT EXISTS players (id SERIAL PRIMARY KEY, name TEXT NOT NULL)")
-    migrations = [
-        ("role",        "TEXT NOT NULL DEFAULT 'Batsman'"),
-        ("base_price",  "INTEGER NOT NULL DEFAULT 0"),
-        ("current_bid", "INTEGER NOT NULL DEFAULT 0"),
-        ("current_team","TEXT DEFAULT 'Unsold'"),
-        ("nationality", "TEXT DEFAULT 'Indian'"),
-        ("runs",        "INTEGER DEFAULT 0"),
-        ("wickets",     "INTEGER DEFAULT 0"),
-        ("strike_rate", "FLOAT DEFAULT 0"),
-        ("bowling_avg", "FLOAT DEFAULT 0"),
-        ("matches",     "INTEGER DEFAULT 0"),
-        ("image_url",   "TEXT DEFAULT ''"),
-    ]
-    for col, defn in migrations:
-        try:
-            cur.execute(f"ALTER TABLE players ADD COLUMN {col} {defn}")
-            conn.commit()
-        except Exception:
-            conn.rollback()
-
-    cur.execute("SELECT COUNT(*) FROM players")
-    count = cur.fetchone()[0]
-
-    # If old data exists with wrong schema, wipe and reseed
+    # Force drop old table so stale string columns are gone
+    cur.execute("DROP TABLE IF EXISTS players")
     cur.execute("""
-        SELECT column_name FROM information_schema.columns
-        WHERE table_name='players' AND column_name='nationality'
+        CREATE TABLE players (
+            id           SERIAL PRIMARY KEY,
+            name         TEXT    NOT NULL,
+            role         TEXT    NOT NULL,
+            base_price   BIGINT  NOT NULL,
+            current_bid  BIGINT  NOT NULL,
+            current_team TEXT    DEFAULT 'Unsold',
+            nationality  TEXT    DEFAULT 'Indian',
+            runs         INTEGER DEFAULT 0,
+            wickets      INTEGER DEFAULT 0,
+            strike_rate  FLOAT   DEFAULT 0,
+            bowling_avg  FLOAT   DEFAULT 0,
+            matches      INTEGER DEFAULT 0,
+            image_url    TEXT    DEFAULT ''
+        )
     """)
-    has_nationality = cur.fetchone()
 
-    if count > 0 and not has_nationality:
-        cur.execute("DELETE FROM players")
-        count = 0
-
-    if count == 0:
-        players = [
-            ("Virat Kohli",   "Batsman",       200000000, 200000000, "Unsold", "Indian",    7263, 4,   130.4, 92.0,  237, "https://i.imgur.com/kohli.png"),
-            ("Rohit Sharma",  "Batsman",       160000000, 160000000, "Unsold", "Indian",    6211, 15,  130.1, 32.0,  243, ""),
-            ("MS Dhoni",      "Wicketkeeper",  120000000, 120000000, "Unsold", "Indian",    5082, 0,   137.0, 0.0,   264, ""),
-            ("Hardik Pandya", "All-Rounder",   150000000, 150000000, "Unsold", "Indian",    2309, 53,  145.2, 30.3,  115, ""),
-            ("KL Rahul",      "Wicketkeeper",  170000000, 170000000, "Unsold", "Indian",    4163, 0,   134.8, 0.0,   132, ""),
-            ("Jasprit Bumrah","Bowler",        180000000, 180000000, "Unsold", "Indian",    56,   165, 100.0, 23.1,  135, ""),
-            ("Shubman Gill",  "Batsman",       130000000, 130000000, "Unsold", "Indian",    2687, 0,   132.3, 0.0,   89,  ""),
-            ("Suryakumar Yadav","Batsman",     160000000, 160000000, "Unsold", "Indian",    3414, 0,   166.7, 0.0,   123, ""),
-            ("Ravindra Jadeja","All-Rounder",  140000000, 140000000, "Unsold", "Indian",    2692, 132, 127.5, 29.5,  236, ""),
-            ("Pat Cummins",   "Bowler",        200000000, 200000000, "Unsold", "Australian",156,  95,  98.7,  26.2,  75,  ""),
-            ("Jos Buttler",   "Wicketkeeper",  150000000, 150000000, "Unsold", "English",   3582, 0,   149.4, 0.0,   104, ""),
-            ("Rashid Khan",   "All-Rounder",   180000000, 180000000, "Unsold", "Afghan",    316,  112, 110.5, 20.9,  92,  ""),
-        ]
-        cur.executemany("""
-            INSERT INTO players
-                (name, role, base_price, current_bid, current_team, nationality,
-                 runs, wickets, strike_rate, bowling_avg, matches, image_url)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        """, players)
+    players = [
+        ("Virat Kohli",      "Batsman",      200000000, 200000000, "Unsold", "Indian",     7263, 4,   130.4, 92.0, 237, ""),
+        ("Rohit Sharma",     "Batsman",      160000000, 160000000, "Unsold", "Indian",     6211, 15,  130.1, 32.0, 243, ""),
+        ("MS Dhoni",         "Wicketkeeper", 120000000, 120000000, "Unsold", "Indian",     5082, 0,   137.0,  0.0, 264, ""),
+        ("Hardik Pandya",    "All-Rounder",  150000000, 150000000, "Unsold", "Indian",     2309, 53,  145.2, 30.3, 115, ""),
+        ("KL Rahul",         "Wicketkeeper", 170000000, 170000000, "Unsold", "Indian",     4163, 0,   134.8,  0.0, 132, ""),
+        ("Jasprit Bumrah",   "Bowler",       180000000, 180000000, "Unsold", "Indian",       56, 165, 100.0, 23.1, 135, ""),
+        ("Shubman Gill",     "Batsman",      130000000, 130000000, "Unsold", "Indian",     2687, 0,   132.3,  0.0,  89, ""),
+        ("Suryakumar Yadav", "Batsman",      160000000, 160000000, "Unsold", "Indian",     3414, 0,   166.7,  0.0, 123, ""),
+        ("Ravindra Jadeja",  "All-Rounder",  140000000, 140000000, "Unsold", "Indian",     2692, 132, 127.5, 29.5, 236, ""),
+        ("Pat Cummins",      "Bowler",       200000000, 200000000, "Unsold", "Australian",  156, 95,   98.7, 26.2,  75, ""),
+        ("Jos Buttler",      "Wicketkeeper", 150000000, 150000000, "Unsold", "English",    3582, 0,   149.4,  0.0, 104, ""),
+        ("Rashid Khan",      "All-Rounder",  180000000, 180000000, "Unsold", "Afghan",      316, 112, 110.5, 20.9,  92, ""),
+    ]
+    cur.executemany("""
+        INSERT INTO players
+            (name, role, base_price, current_bid, current_team, nationality,
+             runs, wickets, strike_rate, bowling_avg, matches, image_url)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    """, players)
 
     conn.commit()
     cur.close()
@@ -139,7 +122,7 @@ def bid():
     cur  = conn.cursor()
     cur.execute("SELECT current_bid FROM players WHERE id=%s", (player_id,))
     row = cur.fetchone()
-    if row and new_bid > row[0]:
+    if row and new_bid > int(row[0]):
         cur.execute(
             "UPDATE players SET current_bid=%s, current_team=%s WHERE id=%s",
             (new_bid, bidder, player_id)
@@ -162,9 +145,9 @@ def api_players():
     rows = cur.fetchall()
     cur.close()
     conn.close()
-    return jsonify([{"id":r[0],"name":r[1],"role":r[2],"bid":r[3],"team":r[4]} for r in rows])
+    return jsonify([{"id":r[0],"name":r[1],"role":r[2],"bid":int(r[3]),"team":r[4]} for r in rows])
 
-# Called at import time so gunicorn (Render) runs it on startup
+# Runs at import time so gunicorn triggers it on every deploy
 init_db()
 
 if __name__ == "__main__":
