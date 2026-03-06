@@ -1,31 +1,19 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-
-<title>Auction Dashboard</title>
-
-<style>
-
-body{
-background:#0b0b0b;
-color:white;
-font-family:Arial;
-text-align:center;
-}
-
-</style>
-
-</head>
-
-<body>
-
 <h1>IPL Auction Dashboard</h1>
 
-<p>User: {{username}}</p>
+<p>{{username}} | Team {{team}}</p>
 
-<p>Team: {{team}}</p>
+<hr>
 
-</body>
+{% for p in players %}
 
-</html>
+<div style="border:1px solid white;padding:15px;margin:10px;width:200px">
+
+<h3>{{p[1]}}</h3>
+
+Base Price: {{p[2]}} <br>
+Highest Bid: {{p[3]}} <br>
+Team: {{p[4]}} <br>
+
+</div>
+
+{% endfor %}
