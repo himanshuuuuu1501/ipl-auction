@@ -1,80 +1,319 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
-<title>IPL Auction Login</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPL Auction 2024 — Enter</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;600;700&family=Barlow+Condensed:wght@400;700&display=swap" rel="stylesheet">
 <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-body{
-background:#0b0b0b;
-color:white;
-font-family:Arial;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-}
+  :root {
+    --gold: #f5c518;
+    --gold2: #e8a000;
+    --red:  #e63946;
+    --dark: #080a0f;
+    --card: #0d1117;
+    --border: rgba(245,197,24,0.25);
+    --text: #e8e8e8;
+    --muted: #6b7280;
+  }
 
-.box{
-background:#111;
-padding:40px;
-border-radius:10px;
-width:300px;
-}
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
 
-h2{
-text-align:center;
-color:#00eaff;
-}
+  /* animated cricket-pitch lines background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 120px,
+        rgba(245,197,24,0.03) 120px,
+        rgba(245,197,24,0.03) 121px
+      ),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 120px,
+        rgba(245,197,24,0.03) 120px,
+        rgba(245,197,24,0.03) 121px
+      );
+    z-index: 0;
+    animation: bgshift 20s linear infinite;
+  }
+  @keyframes bgshift { from { background-position: 0 0; } to { background-position: 120px 120px; } }
 
-input,select{
-width:100%;
-padding:10px;
-margin-top:10px;
-background:#0a0a0a;
-border:1px solid #333;
-color:white;
-}
+  /* glowing orbs */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.18;
+    z-index: 0;
+    animation: float 8s ease-in-out infinite;
+  }
+  .orb1 { width: 500px; height: 500px; background: var(--gold); top: -150px; left: -100px; animation-delay: 0s; }
+  .orb2 { width: 400px; height: 400px; background: var(--red);  bottom: -100px; right: -80px; animation-delay: -4s; }
+  @keyframes float {
+    0%, 100% { transform: translate(0,0); }
+    50%       { transform: translate(20px, -30px); }
+  }
 
-button{
-width:100%;
-padding:10px;
-margin-top:15px;
-background:#00eaff;
-border:none;
-}
+  .wrapper {
+    position: relative;
+    z-index: 10;
+    width: 420px;
+    max-width: 95vw;
+    animation: rise 0.8s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  @keyframes rise { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
 
+  .badge {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .badge-icon {
+    font-size: 52px;
+    display: block;
+    animation: bounce 2s ease-in-out infinite;
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+  .badge-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 52px;
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, var(--gold) 0%, #fff8dc 50%, var(--gold2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+  .badge-sub {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    letter-spacing: 6px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 32px;
+    box-shadow:
+      0 0 0 1px rgba(245,197,24,0.05),
+      0 24px 60px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(245,197,24,0.1);
+    backdrop-filter: blur(20px);
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .field-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .field { margin-bottom: 20px; }
+
+  input, select {
+    width: 100%;
+    padding: 13px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  input::placeholder { color: var(--muted); }
+  input:focus, select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(245,197,24,0.12);
+    background: rgba(245,197,24,0.04);
+  }
+  select option { background: #111; color: white; }
+
+  .select-wrap { position: relative; }
+  .select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 14px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    pointer-events: none;
+    font-size: 14px;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+    border: none;
+    border-radius: 8px;
+    color: #080a0f;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 20px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin-top: 8px;
+    box-shadow: 0 4px 20px rgba(245,197,24,0.3);
+  }
+  .btn::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(245,197,24,0.4); }
+  .btn:hover::after { opacity: 1; }
+  .btn:active { transform: translateY(0); }
+
+  .teams-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+  .team-chip {
+    flex: 1;
+    min-width: 60px;
+    padding: 8px 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--muted);
+    user-select: none;
+  }
+  .team-chip.active, .team-chip:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(245,197,24,0.08);
+  }
+  .team-chip.active { box-shadow: 0 0 0 2px rgba(245,197,24,0.2); }
+
+  #teamHidden { display: none; }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 24px 0;
+  }
+
+  .footer-note {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 20px;
+    letter-spacing: 1px;
+  }
+
+  /* team colours */
+  .chip-CSK.active, .chip-CSK:hover  { border-color:#f5c518; color:#f5c518; background:rgba(245,197,24,0.08); }
+  .chip-MI.active,  .chip-MI:hover   { border-color:#004ba0; color:#6ab0ff; background:rgba(0,75,160,0.12); }
+  .chip-RCB.active, .chip-RCB:hover  { border-color:#e63946; color:#e63946; background:rgba(230,57,70,0.1); }
+  .chip-LSG.active, .chip-LSG:hover  { border-color:#00d1b2; color:#00d1b2; background:rgba(0,209,178,0.08); }
+  .chip-KKR.active, .chip-KKR:hover  { border-color:#7b2d8b; color:#c97ef5; background:rgba(123,45,139,0.1); }
+  .chip-SRH.active, .chip-SRH:hover  { border-color:#ff6b00; color:#ff6b00; background:rgba(255,107,0,0.1); }
+  .chip-DC.active,  .chip-DC:hover   { border-color:#0057e7; color:#5b9bff; background:rgba(0,87,231,0.1); }
+  .chip-PBKS.active,.chip-PBKS:hover { border-color:#ff0000; color:#ff7070; background:rgba(255,0,0,0.1); }
 </style>
-
 </head>
-
 <body>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
 
-<div class="box">
+  <div class="wrapper">
+    <div class="badge">
+      <span class="badge-icon">🏏</span>
+      <div class="badge-title">IPL Auction</div>
+      <div class="badge-sub">Season 2024 · Live Bidding Room</div>
+    </div>
 
-<h2>IPL Auction</h2>
+    <div class="card">
+      <form action="/enter" method="POST" id="loginForm">
+        <div class="field">
+          <label class="field-label">Your Name</label>
+          <input name="username" placeholder="Enter your name…" required autocomplete="off">
+        </div>
 
-<form action="/enter" method="POST">
+        <div class="field">
+          <label class="field-label">Select Your Franchise</label>
+          <div class="teams-row">
+            <div class="team-chip chip-CSK" onclick="pickTeam('CSK',this)">CSK</div>
+            <div class="team-chip chip-MI"  onclick="pickTeam('MI',this)">MI</div>
+            <div class="team-chip chip-RCB" onclick="pickTeam('RCB',this)">RCB</div>
+            <div class="team-chip chip-LSG" onclick="pickTeam('LSG',this)">LSG</div>
+            <div class="team-chip chip-KKR" onclick="pickTeam('KKR',this)">KKR</div>
+            <div class="team-chip chip-SRH" onclick="pickTeam('SRH',this)">SRH</div>
+            <div class="team-chip chip-DC"  onclick="pickTeam('DC',this)">DC</div>
+            <div class="team-chip chip-PBKS" onclick="pickTeam('PBKS',this)">PBKS</div>
+          </div>
+          <input type="hidden" name="team" id="teamHidden" required>
+        </div>
 
-<input name="username" placeholder="Your Name" required>
+        <div class="divider"></div>
 
-<select name="team" required>
+        <button class="btn" type="submit">ENTER AUCTION ROOM →</button>
+      </form>
+    </div>
 
-<option value="">Select Team</option>
-<option value="CSK">CSK</option>
-<option value="MI">MI</option>
-<option value="RCB">RCB</option>
-<option value="LSG">LSG</option>
+    <p class="footer-note">Live bidding · Real-time leaderboard · 12 players up for auction</p>
+  </div>
 
-</select>
-
-<button>Enter Auction</button>
-
-</form>
-
-</div>
-
+<script>
+function pickTeam(val, el) {
+  document.querySelectorAll('.team-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('teamHidden').value = val;
+}
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+  const t = document.getElementById('teamHidden').value;
+  if (!t) { e.preventDefault(); alert('Please select a franchise!'); }
+});
+</script>
 </body>
 </html>
