@@ -27,8 +27,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    /* Changed from hidden to auto to prevent cutting off on small screens */
+    overflow-y: auto; 
+    overflow-x: hidden;
     position: relative;
+    padding: 40px 0;
   }
 
   /* animated cricket-pitch lines background */
@@ -74,7 +77,7 @@
   .wrapper {
     position: relative;
     z-index: 10;
-    width: 420px;
+    width: 440px; /* Slightly wider to accommodate side-by-side buttons */
     max-width: 95vw;
     animation: rise 0.8s cubic-bezier(0.16,1,0.3,1) both;
   }
@@ -165,46 +168,6 @@
     box-shadow: 0 0 0 3px rgba(245,197,24,0.12);
     background: rgba(245,197,24,0.04);
   }
-  select option { background: #111; color: white; }
-
-  .select-wrap { position: relative; }
-  .select-wrap::after {
-    content: '▾';
-    position: absolute;
-    right: 14px; top: 50%;
-    transform: translateY(-50%);
-    color: var(--gold);
-    pointer-events: none;
-    font-size: 14px;
-  }
-
-  .btn {
-    width: 100%;
-    padding: 15px;
-    background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
-    border: none;
-    border-radius: 8px;
-    color: #080a0f;
-    font-family: 'Bebas Neue', cursive;
-    font-size: 20px;
-    letter-spacing: 3px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.15s, box-shadow 0.15s;
-    margin-top: 8px;
-    box-shadow: 0 4px 20px rgba(245,197,24,0.3);
-  }
-  .btn::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(245,197,24,0.4); }
-  .btn:hover::after { opacity: 1; }
-  .btn:active { transform: translateY(0); }
 
   .teams-row {
     display: flex;
@@ -234,13 +197,74 @@
     background: rgba(245,197,24,0.08);
   }
   .team-chip.active { box-shadow: 0 0 0 2px rgba(245,197,24,0.2); }
-
   #teamHidden { display: none; }
 
   .divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--border), transparent);
     margin: 24px 0;
+  }
+
+  /* SIDE-BY-SIDE BUTTON CONTAINER */
+  .button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  /* YELLOW BIDDER BUTTON */
+  .btn-bidder {
+    flex: 1;
+    padding: 14px 10px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+    border: none;
+    border-radius: 8px;
+    color: #080a0f;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 18px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(245,197,24,0.3);
+    text-align: center;
+    white-space: nowrap;
+  }
+  .btn-bidder:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(245,197,24,0.4); }
+  .btn-bidder:active { transform: translateY(0); }
+
+  /* RED AUCTIONEER BUTTON */
+  .btn-auctioneer {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 10px;
+    background: rgba(230, 57, 70, 0.1); 
+    border: 1px solid var(--red);
+    border-radius: 8px;
+    color: var(--red);
+    font-family: 'Bebas Neue', cursive;
+    font-size: 18px;
+    letter-spacing: 2px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 12px rgba(230, 57, 70, 0.4), inset 0 0 8px rgba(230, 57, 70, 0.2);
+    animation: pulse-glow 2s infinite alternate;
+    white-space: nowrap;
+  }
+  .btn-auctioneer:hover {
+    background: var(--red);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(230, 57, 70, 0.8), 0 0 40px rgba(230, 57, 70, 0.5);
+    transform: translateY(-2px);
+    animation: none; 
+  }
+
+  @keyframes pulse-glow {
+    from { box-shadow: 0 0 10px rgba(230, 57, 70, 0.3), inset 0 0 5px rgba(230, 57, 70, 0.1); }
+    to { box-shadow: 0 0 18px rgba(230, 57, 70, 0.6), inset 0 0 10px rgba(230, 57, 70, 0.3); }
   }
 
   .footer-note {
@@ -297,26 +321,15 @@
 
         <div class="divider"></div>
 
-        <button class="btn" type="submit">ENTER AUCTION ROOM →</button>
+        <div class="button-group">
+          <button class="btn-bidder" type="submit">LOGIN AS BIDDER</button>
+          <a href="/auctioneer" class="btn-auctioneer">LOGIN AS AUCTIONEER</a>
+        </div>
+        
       </form>
     </div>
 
     <p class="footer-note">Live bidding · Real-time leaderboard · 12 players up for auction</p>
-    <a href="/auctioneer" style="
-      display:block; text-align:center; margin-top:14px;
-      padding:10px 20px;
-      background:transparent;
-      border:1px solid rgba(230,57,70,0.3);
-      border-radius:8px;
-      color:#e63946;
-      font-family:'Barlow Condensed',sans-serif;
-      font-size:13px; letter-spacing:3px; text-transform:uppercase;
-      text-decoration:none;
-      transition:all .2s;
-    " onmouseover="this.style.background='rgba(230,57,70,0.08)';this.style.borderColor='#e63946'"
-       onmouseout="this.style.background='transparent';this.style.borderColor='rgba(230,57,70,0.3)'">
-      🎙️ Auctioneer Login
-    </a>
   </div>
 
 <script>
