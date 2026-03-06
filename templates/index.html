@@ -6,13 +6,15 @@
 <style>
 
 body{
-    font-family: Arial;
-    background:#f5f5f5;
+    background:black;
+    color:white;
+    font-family:Arial;
     text-align:center;
 }
 
 h1{
-    margin-top:20px;
+    color:#00ffff;
+    text-shadow:0 0 10px #00ffff;
 }
 
 .container{
@@ -22,46 +24,58 @@ h1{
 }
 
 .card{
-    background:white;
-    width:250px;
+    background:#111;
+    border:1px solid #00ffff;
+    width:230px;
     margin:15px;
     padding:20px;
     border-radius:10px;
-    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    box-shadow:0 0 15px #00ffff;
 }
 
-button{
-    padding:8px 14px;
-    margin-top:10px;
-    border:none;
-    border-radius:5px;
-    background:#1e90ff;
-    color:white;
+.player-name{
+    color:#00ffff;
     cursor:pointer;
+    font-size:20px;
 }
 
-.bid-section{
+.stats{
     display:none;
-    margin-top:10px;
+    margin-top:15px;
+    padding:10px;
+    border-top:1px solid #00ffff;
 }
 
 input, select{
-    padding:6px;
-    margin-top:5px;
     width:90%;
+    padding:6px;
+    margin-top:6px;
+    background:black;
+    color:white;
+    border:1px solid #00ffff;
+}
+
+button{
+    margin-top:8px;
+    padding:8px 12px;
+    background:#00ffff;
+    border:none;
+    color:black;
+    font-weight:bold;
+    cursor:pointer;
 }
 
 </style>
 
 <script>
 
-function toggleBid(id){
-    var x = document.getElementById("bid-"+id);
+function showStats(id){
+    let box = document.getElementById("stats-"+id)
 
-    if(x.style.display === "none"){
-        x.style.display = "block";
-    } else {
-        x.style.display = "none";
+    if(box.style.display==="block"){
+        box.style.display="none"
+    }else{
+        box.style.display="block"
     }
 }
 
@@ -71,7 +85,7 @@ function toggleBid(id){
 
 <body>
 
-<h1>🏏 IPL Auction</h1>
+<h1>🏏 IPL Auction Room</h1>
 
 <div class="container">
 
@@ -79,15 +93,48 @@ function toggleBid(id){
 
 <div class="card">
 
-<h2>{{p[1]}}</h2>
+<div class="player-name" onclick="showStats({{p[0]}})">
+{{p[1]}}
+</div>
 
-<p><b>Base Price:</b> {{p[2]}}</p>
-<p><b>Highest Bid:</b> {{p[3]}}</p>
-<p><b>Highest Bidder:</b> {{p[4]}}</p>
+<div class="stats" id="stats-{{p[0]}}">
 
-<button onclick="toggleBid({{p[0]}})">View Player / Bid</button>
+{% if p[1] == "Virat Kohli" %}
+Runs: 7263<br>
+Strike Rate: 130<br>
+Wickets: 4<br>
+Bowling Avg: 92
+{% elif p[1] == "Rohit Sharma" %}
+Runs: 6211<br>
+Strike Rate: 130<br>
+Wickets: 15<br>
+Bowling Avg: 32
+{% elif p[1] == "MS Dhoni" %}
+Runs: 5082<br>
+Strike Rate: 137<br>
+Wickets: 0<br>
+Bowling Avg: N/A
+{% elif p[1] == "Hardik Pandya" %}
+Runs: 2309<br>
+Strike Rate: 145<br>
+Wickets: 53<br>
+Bowling Avg: 30
+{% elif p[1] == "KL Rahul" %}
+Runs: 4163<br>
+Strike Rate: 134<br>
+Wickets: 0<br>
+Bowling Avg: N/A
+{% elif p[1] == "Jasprit Bumrah" %}
+Runs: 56<br>
+Strike Rate: 100<br>
+Wickets: 165<br>
+Bowling Avg: 23
+{% endif %}
 
-<div class="bid-section" id="bid-{{p[0]}}">
+<hr>
+
+Current Bid: {{p[3]}} <br>
+Current Team: {{p[4]}}
 
 <form action="/bid" method="POST">
 
@@ -101,11 +148,7 @@ function toggleBid(id){
 <option value="LSG">LSG</option>
 </select>
 
-<br>
-
 <input type="number" name="bid" placeholder="Enter Bid" required>
-
-<br>
 
 <button type="submit">Place Bid</button>
 
